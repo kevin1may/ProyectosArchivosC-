@@ -1,0 +1,208 @@
+#include<cstdlib>
+#include<iostream>
+#include<fstream>
+#include<string.h>
+using namespace std;
+void altas();
+void bajas();
+void buscar();
+void consultas();
+void modificaciones();
+void salir();
+void menu();
+
+
+//Variables Globales
+char nombre[30], correo[30], seccion[30] ;
+int semestre=0, clave=0, auxClave=0;
+bool encontrado=false;
+char auxGrupo[10], estatus[1], estatusM[1];
+float promedio, promedioM;
+int main(){
+    menu();
+    return 0;
+    system("PAUSE");
+}
+void menu(){
+    int opcion=0;
+    do{
+        cout<<"//**SISTEMA DE ALUMNOS CON ARCHIVOS**//"<<endl;  //creacion de case para el menu 5 diferentes opciones
+        cout<<"1. Dar de Alta un alumno"<<endl;
+        cout<<"2. Mostrar todos lo Alumnos"<<endl;
+        cout<<"3. Buscar un Alumno por Carnet"<<endl;
+        cout<<"4. Modificar Estatus y Promedio"<<endl;
+        cout<<"5. Salir"<<endl;
+        cout<<"Seleccion una opcion Valida "; // selecciones una opcion valida
+        cin>>opcion;  //toma el valor ingresado 
+        switch(opcion){                        //ingresa al case para ir al VOID 
+            case 1:
+                altas();
+            break;            
+            case 2:
+                consultas();
+            break;
+            case 3:
+                buscar();
+            break;
+            case 4:
+                modificaciones();
+            break;
+            case 5:
+                salir(); //funcion de salir del menu
+            break;
+            default:
+                cout<<"?Opcion Invalida!"<<endl; // si se ingresa un opcion invalida devuelve el siguiente error
+        }
+    }while(opcion!=5);
+}//Fin funcion menu/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void altas(){   //alta de alumnos
+    ofstream escritura;  //damos un valor escritura usando ofstream 
+    ifstream consulta;   // damos un valor de lectura
+    bool repetido=false; // bandera pasar saber si ya existe el numero de carnet y evitar crear repetidos es la llave primaria
+    escritura.open("alumnos.txt",ios::out|ios::app); //se crea el archivo 
+    consulta.open("alumnos.txt",ios::in); //se abre y lee el archivo
+    if(escritura.is_open() && consulta.is_open()){  //if para validar si ya fue creado o abierto el archivo
+        cout<<"Ingresa El No Carnet del Alumno: ";  //solicitar datos
+        cin>>auxClave;  //variable auxiliar para tabular el carnet que ingresen
+        consulta>>clave;
+        while(!consulta.eof()){  //ciclo que lee el archivo del inicio hasta elfinal
+            consulta>>nombre>>correo>>semestre>>seccion>>estatus>>promedio;
+            if(clave==auxClave){ //validacion para saber si ya existe el carnet
+                cout<<"Ya Existe un Numero de carnet con esta numeracion"<<endl;  //explicar el error
+                repetido=true;
+                break;
+            }
+            consulta>>clave;  // puntero
+        }
+        if(repetido==false){    // de lo contrario si no existe lo deja pasar y solicita los datos para ingresar
+            cout<<"Ingresa el nombre del Alumno: ";  
+            cin>>nombre;
+            cout<<"Ingresa el correo electronico: ";
+            cin>>correo;
+            cout<<"Ingresa el ciclo escolar: ";
+            cin>>semestre;
+            cout<<"Ingresa la seccion: ";
+            cin>>seccion;
+            cout<<"Ingresa el Estatus A =aprobado y R= reprobado: ";
+            cin>>estatus;
+            cout<<"Ingresa el promedio puedes usar decimales: ";
+            cin>>promedio;
+            escritura<<auxClave<<" "<<nombre<<" "<<correo<<" "<<semestre<<" "<<seccion<<" "<<estatus<<" "<<promedio<<endl; //cuando se tienen todos los datos los escribe
+            cout<<"Alumnos Agregado correctamente "<<endl; // mensaje que valida que estan correctos
+        }
+
+    }else{
+        cout<<"Error, el Archivo No se Pudo Abrir o No ha sido Creado"<<endl; // si dal algun tipo de error pasa a este dato o si se corrompio
+    }
+    escritura.close();  //se cierra el archivo
+    consulta.close();	// se cierra el archivo
+}//Fin funcion altas
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void consultas(){
+    ifstream lectura; // se inicializa como lectura
+    lectura.open("alumnos.txt",ios::out|ios::in); //se va a leer el archivo
+    if(lectura.is_open()){ //lectura de apertura  se condiciona para saber si se pudo abrir o existe el archivo
+        cout<<"Registros del Archivo alumnos.txt"<<endl;
+        cout<<"________________________________"<<endl;        
+        lectura>>clave;  // se adelante lectura
+        while(!lectura.eof()){  //ciclo para leer todo el archivo
+        	lectura>>nombre>>correo>>semestre>>seccion>>estatus>>promedio; //
+            cout<<"No de Carnet: "<<clave<<endl;
+            cout<<"Nombre: "<<nombre<<endl;
+            cout<<"Correo Electronico: "<<correo<<endl;
+            cout<<"Ciclo Escolar : "<<semestre<<endl;
+            cout<<"Seccion: "<<seccion<<endl;
+            cout<<"Estatus: "<<estatus<<endl;
+            cout<<"Promedio: "<<promedio<<endl;
+            lectura>>clave>>nombre>>correo>>semestre>>seccion>>estatus>>promedio; // se leen todos lo datos con las variables globales
+            cout<<"________________________________"<<endl;
+        }
+    }else{
+        cout<<"Error, el Archivo No se Pudo Abrir, No ha sido creado"<<endl; // si da error pasa al else y termina la condicion
+    }
+    lectura.close(); //se cierra el archivo
+}//Fin funcion consultas
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void buscar(){
+    ifstream lectura;//Creamos la variable de tipo lectura
+    lectura.open("alumnos.txt",ios::out|ios::in);//Abrimos el archivo
+    //validando la apertura del archivo
+    encontrado=false;
+    if(lectura.is_open()){
+        cout<<"Ingresa la Clave del Alumno que deseas Buscar: ";
+        cin>>auxClave;// variable auxiliar para validar el carnet y comparar con el del archivo
+        lectura>>clave;//lectura adelantada
+        while(!lectura.eof()){  //ciclo para leer el archivo completo desde el inicio hasta el final
+        	lectura>>nombre>>correo>>semestre>>seccion>>estatus>>promedio; //leyendo los campos del registro
+            //Comparar cada registro para ver si es encontrado
+            if(auxClave==clave){  //validar dato de entrada asi como dato de salida comparar
+            cout<<"No de Carnet: "<<clave<<endl;
+            cout<<"Nombre: "<<nombre<<endl;
+            cout<<"Correo Electronico: "<<correo<<endl;
+            cout<<"Ciclo Escolar : "<<semestre<<endl;
+            cout<<"Seccion: "<<seccion<<endl;
+            cout<<"Estatus: "<<estatus<<endl;
+            cout<<"Promedio: "<<promedio<<endl;
+            encontrado=true; // variable bandera para que cambia a verdadero
+            }
+
+            lectura>>clave;//lectura adelantada
+        }
+        if(encontrado==false){
+            cout<<"No hay registros con la Clave "<<auxClave<<endl; // si no existen datos con ese numero de carnet
+        }
+    }else{
+        cout<<"No se pudo Abrir el Archivo, aun no ha sido Creado"<<endl;  //validar si existe el archivo
+    }
+    //cerrando el archivo
+    lectura.close();
+}
+void modificaciones(){
+    ofstream aux;  //
+    ifstream lectura;
+    encontrado=false; // bandera para saber si existe el archivo
+    int auxClave=0;  // variable que compara el numero de carnet
+    aux.open("auxiliar.txt",ios::out); // archivo auxiliar para lectura y escritura
+    lectura.open("alumnos.txt",ios::in); //archivo original creado
+    if(aux.is_open() && lectura.is_open()){  //condicion para abrir los 2 archivos
+        cout<<"Ingresa la Clave del Alumno que deseas Modificar: "; //
+        cin>>auxClave;
+        lectura>>clave;
+        while(!lectura.eof()){  //archivo que leera todo el archivo hasta el final 
+            lectura>>nombre>>correo>>semestre>>seccion>>estatus>>promedio; // leer los datos
+            if(auxClave==clave){ //si la clave tabulada es correcto entra al IF para realizar los cambios
+                encontrado=true;
+                cout<<"__________________________"<<endl;
+                cout<<"No de Carnet: "<<clave<<endl;
+                cout<<"Nombre: "<<nombre<<endl;
+                cout<<"Correo Electronico: "<<correo<<endl;
+                cout<<"Ciclo Escolar : "<<semestre<<endl;
+                cout<<"Seccion: "<<seccion<<endl;
+                cout<<"Estatus ACTUAL: "<<estatus<<endl;
+                cout<<"Promedio ACTUAL : "<<promedio<<endl;
+                cout<<"__________________________"<<endl;
+                cout<<"Ingresa el Nuevo Estatus del Alumno: A=aprobado y R=reprobado"<<": ";  //solicita cambiar el nuevo estatus
+                cin>>estatusM;
+                cout<<"Ingresa el Nuevo promedio del alumno puedes usar decimales: "<<": "; //solicita cambiar el nuevo promedio
+                cin>>promedioM;
+                aux<<clave<<" "<<nombre<<" "<<correo<<" "<<semestre<<" "<<seccion<<" "<<estatusM<<" "<<promedioM<<endl; // como es correcto cambia los valores de los ultimos 2 solicitados
+                cout<<"Registro Modificado"<<endl; //mensaje exitoso de realizado
+            }else{
+                aux<<clave<<" "<<nombre<<" "<<correo<<" "<<semestre<<" "<<seccion<<" "<<estatus<<" "<<promedio<<endl; //de lo contrario guarda todos los datos igual a como los lee
+            }
+            lectura>>clave; // puntero adelantado
+        }
+    }else{
+        cout<<"No se pudo abrir el Archivo o aun no ha sido Creado"<<endl; // no ha sido creado el archivo o no existe
+    }
+    if(encontrado==false){
+        cout<<"No se encontro ningun registro con clave "<<auxClave<<endl; //no se encontro ningun datos con esa clave 
+    }
+    aux.close(); // si todo es correcto seguimos y procedemos 
+    lectura.close(); // si todo es correcto seguimos y procedemos
+    remove("alumnos.txt"); // eliminamos el archivo 
+    rename("auxiliar.txt","alumnos.txt"); // renombramos el archivo temporal donde se fuardaron los cambios efectuados de manera correcta
+}
+void salir(){
+    cout<<"Programa Finalizado"<<endl; //fin del programa
+}
